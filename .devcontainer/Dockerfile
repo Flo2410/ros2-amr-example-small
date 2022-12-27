@@ -4,7 +4,7 @@ FROM althack/ros2:foxy-dev
 #
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
-   && apt-get -y install --no-install-recommends libyaml-cpp-dev libfftw3-dev libtiff5-dev \
+   && apt-get -y install --no-install-recommends libyaml-cpp-dev libfftw3-dev libtiff5-dev ros-foxy-visualization-msgs \
    #
    # Clean up
    && apt-get autoremove -y \
