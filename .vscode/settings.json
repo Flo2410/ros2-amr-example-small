@@ -1,7 +1,7 @@
 {
-    "editor.tabSize": 8,
+    "editor.tabSize": 2,
     "editor.rulers": [
-        100
+        120
     ],
     "files.associations": {
         "*.css": "tailwindcss",
@@ -86,8 +86,8 @@
         "--max-line-length=100"
     ],
     "C_Cpp.default.intelliSenseMode": "linux-gcc-x86",
-    "C_Cpp.formatting": "Disabled",
-    "uncrustify.configPath.linux": "/opt/ros/foxy/lib/python3.8/site-packages/ament_uncrustify/configuration/ament_code_style.cfg",
+    "C_Cpp.formatting": "disabled",
+    "uncrustify.configPath.linux": "/workspaces/ros2-amr-example-small/ament_code_style.cfg",
     "[cpp]": {
         "editor.defaultFormatter": "zachflower.uncrustify"
     },

@@ -1,4 +1,3 @@
-
 #include "OrderOptimizerNode.h"
 
 int main(int argc, char **argv)
@@ -10,4 +9,3 @@ int main(int argc, char **argv)
   rclcpp::shutdown();
   return 0;
 }
-

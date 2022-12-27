@@ -7,13 +7,14 @@
 #include <tiff.h>
 
 //------------------------------------------------------------------------------------------------------------------------------------
-OrderOptimizerNode::OrderOptimizerNode() : Node("OrderOptimizer")
+OrderOptimizerNode::OrderOptimizerNode()
+: Node("OrderOptimizer")
 {
   // file for test purpose
   file = "output_";
   file += std::to_string((rand() % 10 + 1));
   outputFile.open(file + ".txt");
-  
+
   // TODO: get Parameter + create Publisher + Subscriber
 }
 
@@ -25,7 +26,7 @@ void OrderOptimizerNode::msgCurrentPos(geometry_msgs::msg::PoseStamped::SharedPt
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
-bool compare(std::pair<float, Part> p1, std::pair<float, Part> p2) { return p1.first < p2.first; }
+bool compare(std::pair<float, Part> p1, std::pair<float, Part> p2) {return p1.first < p2.first;}
 
 //------------------------------------------------------------------------------------------------------------------------------------
 void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
@@ -54,12 +55,13 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
       for (auto &file : std::filesystem::directory_iterator(folder.path())) {
         // TODO: parse files using one of the parser methods
       }
-	  
+
       // std::cout << "before threads" << std::endl;
 
       for (std::thread &thread : threads_) {
-        if (thread.joinable())
+        if (thread.joinable()) {
           thread.join();
+        }
       }
       // std::cout << "threads" << std::endl;
       if (!found) {
@@ -67,13 +69,15 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
         outputFile << "[ERROR]: Order " << order_id << " not found!\n";
         return;
       }
-    } else if (folder.is_directory() && (folder.path().filename().string()).compare("configuration") == 0
-               && !configuration_already) {
+    } else if (folder.is_directory() && (folder.path().filename().string()).compare("configuration") == 0 &&
+      !configuration_already)
+    {
       for (auto &file : std::filesystem::directory_iterator(folder.path())) {
         parseConfFile(file.path());
       }
-    } else if (found && configuration_already)
+    } else if (found && configuration_already) {
       break;
+    }
   }
 
   if (!found || !configuration_already) {
@@ -88,8 +92,9 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
-void OrderOptimizerNode::PathOutput(msg_package::msg::Order::SharedPtr msg, std::vector<std::pair<float, Part>> vector,
-                                    OrderDetails details_)
+void OrderOptimizerNode::PathOutput(
+  msg_package::msg::Order::SharedPtr msg, std::vector<std::pair<float, Part>> vector,
+  OrderDetails details_)
 {
 
   std::cout << "Working on order " << msg->order_id << " (" << msg->description << ")" << std::endl;
@@ -98,13 +103,13 @@ void OrderOptimizerNode::PathOutput(msg_package::msg::Order::SharedPtr msg, std:
   size_t i = 0;
   for (; i < vector.size(); i++) {
 
-    std::cout << i << ". Fetching part '" << vector[i].second.part_name << "' for product '"
-              << vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " << vector[i].second.cy
-              << std::endl;
+    std::cout << i << ". Fetching part '" << vector[i].second.part_name << "' for product '" <<
+      vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " << vector[i].second.cy <<
+      std::endl;
 
-    outputFile << i << ". Fetching part '" << vector[i].second.part_name << "' for product '"
-               << vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " << vector[i].second.cy
-               << std::endl;
+    outputFile << i << ". Fetching part '" << vector[i].second.part_name << "' for product '" <<
+      vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " << vector[i].second.cy <<
+      std::endl;
   }
 
   std::cout << i << ". Delivering to destination x:" << details_.cx << ", y: " << details_.cy << std::endl;
@@ -211,8 +216,9 @@ void OrderOptimizerNode::parseConfFile(fs::path file)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
-void OrderOptimizerNode::parseOrderFile(fs::path file, uint32 order_id, bool &found, OrderDetails *details,
-                                        std::vector<std::string> &pr)
+void OrderOptimizerNode::parseOrderFile(
+  fs::path file, uint32 order_id, bool &found, OrderDetails *details,
+  std::vector<std::string> &pr)
 {
   // std::cout << "I am thread " << std::this_thread::get_id() << " working with file " << file.string() << std::endl;
 

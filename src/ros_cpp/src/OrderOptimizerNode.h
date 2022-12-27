@@ -52,8 +52,8 @@ private:
   void msgNextOrder(msg_package::msg::Order::SharedPtr msg);
 
   void parseOrderFile(
-    fs::path file, uint32 order_id, bool & found, OrderDetails * details,
-    std::vector<std::string> & pr);
+    fs::path file, uint32 order_id, bool &found, OrderDetails *details,
+    std::vector<std::string> &pr);
 
   void parseConfFile(fs::path file);
 
