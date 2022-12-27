@@ -16,6 +16,24 @@ OrderOptimizerNode::OrderOptimizerNode()
   outputFile.open(file + ".txt");
 
   // TODO: get Parameter + create Publisher + Subscriber
+
+  // get Param -> absolute path to files/
+  // "fieles" contains dirs "orders" and "configuration"
+  // orders: one file per day of orders
+  // configuration: one file with product specific configurations stating how a product can be manufactured
+
+
+  // publisher -> topic "order_path" as visualization_msgs/MarkerArray
+  // AMR position as "CUBE"
+  // each part pickup location as "CYLINDER"
+
+
+  // subscriber -> 'currentPosition’ and ‘nextOrder'
+  // currentPosition: current AMR position as geometry_msgs/PostStamped
+
+  // nextOrder: the next order assigned to the AMR as an msg_package/order
+
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
