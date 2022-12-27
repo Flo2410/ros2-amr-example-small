@@ -72,6 +72,8 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
 
       for (auto &file : std::filesystem::directory_iterator(folder.path())) {
         // TODO: parse files using one of the parser methods
+        // As seen in the if statement above, the file to parse is a orders file
+        parseOrderFile(file.path(), order_id, found, &details_, details_.products);
       }
 
       // std::cout << "before threads" << std::endl;
