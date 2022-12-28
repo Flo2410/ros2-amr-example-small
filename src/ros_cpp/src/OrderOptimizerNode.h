@@ -48,6 +48,9 @@ private:
   geometry_msgs::msg::PoseStamped::SharedPtr current_pose;
   std::mutex mutex_;
 
+  rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_position_sub;
+  rclcpp::Subscription<msg_package::msg::Order>::SharedPtr next_order_sub;
+
   void msgCurrentPos(geometry_msgs::msg::PoseStamped::SharedPtr msg);
   void msgNextOrder(msg_package::msg::Order::SharedPtr msg);
 

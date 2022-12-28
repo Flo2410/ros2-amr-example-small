@@ -30,10 +30,16 @@ OrderOptimizerNode::OrderOptimizerNode()
 
   // subscriber -> 'currentPosition’ and ‘nextOrder'
   // currentPosition: current AMR position as geometry_msgs/PostStamped
+  current_position_sub =
+    this->create_subscription<geometry_msgs::msg::PoseStamped>(
+    "currentPosition", 10,
+    std::bind(&OrderOptimizerNode::msgCurrentPos, this, std::placeholders::_1));
 
-  // nextOrder: the next order assigned to the AMR as an msg_package/order
-
-
+  // nextOrder: the next order assigned to the AMR as an msg_package/Order
+  next_order_sub =
+    this->create_subscription<msg_package::msg::Order>(
+    "nextOrder", 10,
+    std::bind(&OrderOptimizerNode::msgNextOrder, this, std::placeholders::_1));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
