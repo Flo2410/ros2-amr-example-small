@@ -21,7 +21,7 @@ OrderOptimizerNode::OrderOptimizerNode()
   // "fieles" contains dirs "orders" and "configuration"
   // orders: one file per day of orders
   // configuration: one file with product specific configurations stating how a product can be manufactured
-
+  this->declare_parameter("path");
 
   // publisher -> topic "order_path" as visualization_msgs/MarkerArray
   // AMR position as "CUBE"
