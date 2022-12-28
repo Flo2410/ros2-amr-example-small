@@ -39,6 +39,7 @@
 		"twxs.cmake",
 		"yzhang.markdown-all-in-one",
 		"zachflower.uncrustify",
-		"eamodio.gitlens"
+		"eamodio.gitlens",
+		"albert.TabOut"
 	]
 }
