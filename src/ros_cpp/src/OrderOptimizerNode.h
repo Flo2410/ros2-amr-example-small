@@ -9,6 +9,7 @@
 #include <iostream>
 #include <tiff.h>
 
+// cx, cy are the destination
 struct OrderDetails
 {
   int order_id;
@@ -17,6 +18,7 @@ struct OrderDetails
   std::vector<std::string> products;
 };
 
+// cx, cy are the location of the part
 struct Part
 {
   std::string part_name;

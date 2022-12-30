@@ -56,8 +56,9 @@ bool compare(std::pair<float, Part> p1, std::pair<float, Part> p2) {return p1.fi
 void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
 {
   path_ = this->get_parameter("path").get_value<std::string>();
-  //  RCLCPP_INFO(this->get_logger(), "I heard nextOrder msg of order: '%d' ( '%s' )",msg->order_id,
-  //  msg->description.c_str());
+  RCLCPP_INFO(
+    this->get_logger(), "I heard nextOrder msg of order: '%d' ( '%s' )", msg->order_id,
+    msg->description.c_str()); // DEBUG
   if (!fs::is_directory(path_)) {
     std::cout << "[ERROR]: Absolute path is not a directory!" << std::endl;
     outputFile << "[ERROR]: Absolute path is not a directory!\n";
@@ -146,6 +147,38 @@ void OrderOptimizerNode::PathOutput(
 std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDetails details_)
 {
   // TODO: Implement me
+  // As I don't know for what the float in the pair is, I assume that it's the distance of the part.
+  // This is based on the usage of the pair in the bool compare(std::pair<float, Part> p1, std::pair<float, Part> p2); function,
+  // which I assume to check which part is closer
+
+  std::vector<std::pair<float, Part>> shortest_path;
+
+  // Loop through all product names of the order
+  for (auto it_product_name = details_.products.begin(); it_product_name != details_.products.end();
+    it_product_name++)
+  {
+    ProductDetails product = products.at(std::atoi(it_product_name->data()));
+
+    // RCLCPP_INFO(this->get_logger(), "Parts for %s (%s):", product.product_name.data(), it_product_name->data()); // DEBUG
+
+    // Loop through all parts of the product
+    for (auto it_part = product.parts.begin(); it_part != product.parts.end(); it_part++) {
+      // calculate the distance to the part
+      it_part->distance = OrderOptimizerNode::distance(
+        current_pose->pose.position.x, current_pose->pose.position.y,
+        it_part->cx, it_part->cy);
+
+      // RCLCPP_INFO(this->get_logger(), "name: %s, distance: %f", it_part->part_name.data(), it_part->distance); // DEBUG
+
+      // Add the part to the vector
+      shortest_path.push_back(std::make_pair(it_part->distance, *it_part));
+    }
+  }
+
+  // sort vector by distance
+  std::sort(shortest_path.begin(), shortest_path.end(), compare);
+
+  return shortest_path;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
