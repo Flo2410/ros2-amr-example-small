@@ -26,6 +26,7 @@ OrderOptimizerNode::OrderOptimizerNode()
   // publisher -> topic "order_path" as visualization_msgs/MarkerArray
   // AMR position as "CUBE"
   // each part pickup location as "CYLINDER"
+  order_path_pub = this->create_publisher<visualization_msgs::msg::MarkerArray>("order_path", 10);
 
 
   // subscriber -> 'currentPosition’ and ‘nextOrder'
@@ -194,6 +195,8 @@ void OrderOptimizerNode::PublishMarkerArray(std::vector<std::pair<float, Part>> 
     auto pickupMarker = Pickup(*it);
     markerArray.markers.push_back(pickupMarker);
   }
+
+  order_path_pub->publish(markerArray);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------

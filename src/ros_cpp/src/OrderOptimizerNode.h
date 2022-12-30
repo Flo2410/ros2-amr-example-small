@@ -53,6 +53,8 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_position_sub;
   rclcpp::Subscription<msg_package::msg::Order>::SharedPtr next_order_sub;
 
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr order_path_pub;
+
   void msgCurrentPos(geometry_msgs::msg::PoseStamped::SharedPtr msg);
   void msgNextOrder(msg_package::msg::Order::SharedPtr msg);
 
