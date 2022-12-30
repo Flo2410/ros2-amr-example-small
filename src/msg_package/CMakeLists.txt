@@ -26,9 +26,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
-rosidl_generate_interfaces(${PROJECT_NAME}
-        "msg/Order.msg"
-        )
+rosidl_generate_interfaces(${PROJECT_NAME} "msg/Order.msg")
 
 
 if(BUILD_TESTING)
