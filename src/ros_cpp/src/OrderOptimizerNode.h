@@ -1,13 +1,19 @@
+#include <tiff.h>
+#include <filesystem>
+
+#include <fstream>
+#include <iostream>
+#include <utility>
+#include <string>
+#include <map>
+#include <vector>
+
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "msg_package/msg/order.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.h"
+#include "std_msgs/msg/string.hpp"
 #include "visualization_msgs/msg/marker_array.hpp"
 
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <tiff.h>
 
 // cx, cy are the destination
 struct OrderDetails
@@ -39,7 +45,10 @@ class OrderOptimizerNode : public rclcpp::Node
 {
 public:
   OrderOptimizerNode();
-  ~OrderOptimizerNode() {outputFile.close();}
+  ~OrderOptimizerNode()
+  {
+    outputFile.close();
+  }
   std::ofstream outputFile;
   std::string file;
 

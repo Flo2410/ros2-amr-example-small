@@ -1,10 +1,15 @@
 #include "OrderOptimizerNode.h"
 
-#include "rclcpp/rclcpp.hpp"
-#include "yaml-cpp/yaml.h"
-
-#include <memory>
 #include <tiff.h>
+#include <memory>
+#include <utility>
+#include <string>
+#include <vector>
+#include <list>
+#include <algorithm>
+
+#include "yaml-cpp/yaml.h"
+#include "rclcpp/rclcpp.hpp"
 
 //------------------------------------------------------------------------------------------------------------------------------------
 OrderOptimizerNode::OrderOptimizerNode()
@@ -15,12 +20,13 @@ OrderOptimizerNode::OrderOptimizerNode()
   file += std::to_string((rand() % 10 + 1));
   outputFile.open(file + ".txt");
 
-  // TODO: get Parameter + create Publisher + Subscriber
+  // get Parameter + create Publisher + Subscriber
 
   // get Param -> absolute path to files/
   // "fieles" contains dirs "orders" and "configuration"
   // orders: one file per day of orders
-  // configuration: one file with product specific configurations stating how a product can be manufactured
+  // configuration: one file with product specific configurations
+  //                stating how a product can be manufactured
   this->declare_parameter("path");
 
   // publisher -> topic "order_path" as visualization_msgs/MarkerArray
@@ -59,7 +65,7 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
   path_ = this->get_parameter("path").get_value<std::string>();
   RCLCPP_INFO(
     this->get_logger(), "I heard nextOrder msg of order: '%d' ( '%s' )", msg->order_id,
-    msg->description.c_str()); // DEBUG
+    msg->description.c_str());  // DEBUG
   if (!fs::is_directory(path_)) {
     std::cout << "[ERROR]: Absolute path is not a directory!" << std::endl;
     outputFile << "[ERROR]: Absolute path is not a directory!\n";
@@ -79,7 +85,7 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
       std::list<std::thread> threads_;
 
       for (auto &file : std::filesystem::directory_iterator(folder.path())) {
-        // TODO: parse files using one of the parser methods
+        // parse files using one of the parser methods
         // As seen in the if statement above, the file to parse is a orders file
         parseOrderFile(file.path(), order_id, found, &details_, details_.products);
       }
@@ -97,8 +103,8 @@ void OrderOptimizerNode::msgNextOrder(msg_package::msg::Order::SharedPtr msg)
         outputFile << "[ERROR]: Order " << order_id << " not found!\n";
         return;
       }
-    } else if (folder.is_directory() && (folder.path().filename().string()).compare("configuration") == 0 &&
-      !configuration_already)
+    } else if (folder.is_directory() &&
+      (folder.path().filename().string()).compare("configuration") == 0 && !configuration_already)
     {
       for (auto &file : std::filesystem::directory_iterator(folder.path())) {
         parseConfFile(file.path());
@@ -124,32 +130,35 @@ void OrderOptimizerNode::PathOutput(
   msg_package::msg::Order::SharedPtr msg, std::vector<std::pair<float, Part>> vector,
   OrderDetails details_)
 {
-
   std::cout << "Working on order " << msg->order_id << " (" << msg->description << ")" << std::endl;
-  outputFile << "Working on order " << msg->order_id << " (" << msg->description << ")" << std::endl;
+  outputFile << "Working on order " << msg->order_id << " (" << msg->description << ")" <<
+    std::endl;
 
   size_t i = 0;
   for (; i < vector.size(); i++) {
-
     std::cout << i << ". Fetching part '" << vector[i].second.part_name << "' for product '" <<
-      vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " << vector[i].second.cy <<
+      vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " <<
+      vector[i].second.cy <<
       std::endl;
 
     outputFile << i << ". Fetching part '" << vector[i].second.part_name << "' for product '" <<
-      vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " << vector[i].second.cy <<
+      vector[i].second.parent_product << "' at x: " << vector[i].second.cx << ", y: " <<
+      vector[i].second.cy <<
       std::endl;
   }
 
-  std::cout << i << ". Delivering to destination x:" << details_.cx << ", y: " << details_.cy << std::endl;
-  outputFile << i << ". Delivering to destination x:" << details_.cx << ", y: " << details_.cy << std::endl;
+  std::cout << i << ". Delivering to destination x:" << details_.cx << ", y: " << details_.cy <<
+    std::endl;
+  outputFile << i << ". Delivering to destination x:" << details_.cx << ", y: " << details_.cy <<
+    std::endl;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
 std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDetails details_)
 {
-  // TODO: Implement me
   // As I don't know for what the float in the pair is, I assume that it's the distance of the part.
-  // This is based on the usage of the pair in the bool compare(std::pair<float, Part> p1, std::pair<float, Part> p2); function,
+  // This is based on the usage of the pair in the
+  // bool compare(std::pair<float, Part> p1, std::pair<float, Part> p2); function,
   // which I assume to check which part is closer
 
   std::vector<std::pair<float, Part>> shortest_path;
@@ -160,7 +169,8 @@ std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDe
   {
     ProductDetails product = products.at(std::atoi(it_product_name->data()));
 
-    // RCLCPP_INFO(this->get_logger(), "Parts for %s (%s):", product.product_name.data(), it_product_name->data()); // DEBUG
+    // RCLCPP_INFO(this->get_logger(), "Parts for %s (%s):", product.product_name.data(),
+    // it_product_name->data()); // DEBUG
 
     // Loop through all parts of the product
     for (auto it_part = product.parts.begin(); it_part != product.parts.end(); it_part++) {
@@ -169,7 +179,8 @@ std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDe
         current_pose->pose.position.x, current_pose->pose.position.y,
         it_part->cx, it_part->cy);
 
-      // RCLCPP_INFO(this->get_logger(), "name: %s, distance: %f", it_part->part_name.data(), it_part->distance); // DEBUG
+      // RCLCPP_INFO(this->get_logger(), "name: %s, distance: %f",
+      // it_part->part_name.data(), it_part->distance); // DEBUG
 
       // Add the part to the vector
       shortest_path.push_back(std::make_pair(it_part->distance, *it_part));
@@ -253,7 +264,7 @@ float OrderOptimizerNode::distance(float x1, float y1, float x2, float y2)
 //------------------------------------------------------------------------------------------------------------------------------------
 void OrderOptimizerNode::parseConfFile(fs::path file)
 {
-  // std::cout << "working with file " << file.string() << std::endl;
+  // std::cout << "working with file " << file.string() << std::endl; //DEBUG
 
   YAML::Node config = YAML::LoadFile(file.string());
   for (size_t i = 0; i < config.size(); ++i) {
@@ -282,7 +293,8 @@ void OrderOptimizerNode::parseOrderFile(
   fs::path file, uint32 order_id, bool &found, OrderDetails *details,
   std::vector<std::string> &pr)
 {
-  // std::cout << "I am thread " << std::this_thread::get_id() << " working with file " << file.string() << std::endl;
+  // std::cout << "I am thread " << std::this_thread::get_id() << " working with file "
+  // << file.string() << std::endl; //DEBUG
 
   std::vector<std::string> &pr_ = const_cast<std::vector<std::string> &>(pr);
   YAML::Node config = YAML::LoadFile(file.string());
