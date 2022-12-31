@@ -1,0 +1,6 @@
+name: 'Test_ros_cpp'
+description: 'Test only ros_cpp package using devcontainer'
+runs:
+  using: 'docker'
+  image: '../../../.devcontainer/Dockerfile'
+  entrypoint: ".github/actions/test_ros_cpp/run.sh"

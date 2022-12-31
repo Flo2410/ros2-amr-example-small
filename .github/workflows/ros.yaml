@@ -16,6 +16,17 @@ jobs:
       -
         name: Test
         uses: ./.github/actions/test/
+  
+  test_ros_cpp:
+    name: test_ros_cpp
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Checkout code
+        uses: actions/checkout@v3
+      -
+        name: Test_ros_cpp
+        uses: ./.github/actions/test_ros_cpp/
 
   lint:
     name: ament_${{ matrix.linter }}
