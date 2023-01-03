@@ -18,7 +18,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/install/lib/${input:package}/${input:program}",
-      "args": [],
+      "args": ["--ros-args", "-p", "path:=/workspaces/ros2-amr-example-small/src/"],
       "preLaunchTask": "build",
       "stopAtEntry": true,
       "cwd": "${workspaceFolder}",
