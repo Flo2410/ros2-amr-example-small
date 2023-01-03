@@ -162,6 +162,8 @@ std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDe
   // which I assume to check which part is closer
 
   std::vector<std::pair<float, Part>> shortest_path;
+  std::vector<std::pair<float, Part>> parts_to_collect;  // contains all parts which still need to be collected
+  bool already_deleted = false;  // if a part was already deleted from parts_to_collect
 
   // Loop through all product names of the order
   for (auto it_product_name = details_.products.begin(); it_product_name != details_.products.end();
@@ -173,7 +175,7 @@ std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDe
     // it_product_name->data()); // DEBUG
 
     // Loop through all parts of the product
-    for (auto it_part = product.parts.begin(); it_part != product.parts.end(); it_part++) {
+    for (auto it_part = product.parts.begin(); it_part != product.parts.end(); ++it_part) {
       // calculate the distance to the part
       it_part->distance = OrderOptimizerNode::distance(
         current_pose->pose.position.x, current_pose->pose.position.y,
@@ -183,17 +185,78 @@ std::vector<std::pair<float, Part>> OrderOptimizerNode::FindShortestPath(OrderDe
       // it_part->part_name.data(), it_part->distance); // DEBUG
 
       // Add the part to the vector
-      shortest_path.push_back(std::make_pair(it_part->distance, *it_part));
+      parts_to_collect.push_back(std::make_pair(it_part->distance, *it_part));
     }
   }
 
-  // sort vector by distance
-  std::sort(shortest_path.begin(), shortest_path.end(), compare);
+  std::pair<float, Part> part_to_search_from = OrderOptimizerNode::findClosestPart(
+    current_pose->pose.position.x, current_pose->pose.position.y,
+    parts_to_collect);
+  shortest_path.push_back(part_to_search_from);
 
+  // remove part from vector
+  parts_to_collect.erase(
+    std::remove_if(
+      parts_to_collect.begin(),
+      parts_to_collect.end(), [&](const std::pair<float, Part> p) {
+        bool is_match = p.second.part_name == part_to_search_from.second.part_name &&
+        p.second.parent_product == part_to_search_from.second.parent_product;
+
+        if (is_match && !already_deleted) {
+          already_deleted = true;
+          return true;
+        }
+        return false;
+      }));
+  already_deleted = false;
+
+  for (int i = parts_to_collect.size(); i > 0; --i) {
+    // find closest part
+    std::pair<float, Part> closest_part = OrderOptimizerNode::findClosestPart(
+      part_to_search_from.second.cx, part_to_search_from.second.cy,
+      parts_to_collect);
+
+    // add closest part to path vector
+    shortest_path.push_back(closest_part);
+    part_to_search_from = closest_part;
+
+    // delete part from vector
+    parts_to_collect.erase(
+      std::remove_if(
+        parts_to_collect.begin(),
+        parts_to_collect.end(), [&](const std::pair<float, Part> p) {
+          bool is_match = p.second.part_name == closest_part.second.part_name &&
+          p.second.parent_product == closest_part.second.parent_product;
+
+          if (is_match && !already_deleted) {
+            already_deleted = true;
+            return true;
+          }
+          return false;
+        }));
+    already_deleted = false;
+
+  }
   return shortest_path;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------
+
+std::pair<float, Part> OrderOptimizerNode::findClosestPart(
+  float x, float y, std::vector<std::pair<float,
+  Part>> &parts)
+{
+  std::pair<float, Part> closest = parts.front();
+
+  for (auto it = parts.begin(); it != parts.end(); it++) {
+    float distance = OrderOptimizerNode::distance(x, y, it->second.cx, it->second.cy);
+    if (distance < closest.first) {
+      closest = std::make_pair(distance, it->second);
+    }
+  }
+
+  return closest;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------
 void OrderOptimizerNode::PublishMarkerArray(std::vector<std::pair<float, Part>> path_vec)

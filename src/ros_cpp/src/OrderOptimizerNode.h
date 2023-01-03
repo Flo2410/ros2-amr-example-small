@@ -82,6 +82,7 @@ private:
   visualization_msgs::msg::Marker Pickup(std::pair<float, Part> pair);
 
   std::vector<std::pair<float, Part>> FindShortestPath(OrderDetails details);
+  std::pair<float, Part> findClosestPart(float x, float y, std::vector<std::pair<float, Part>> &parts);
 
   void PathOutput(
     msg_package::msg::Order::SharedPtr msg, std::vector<std::pair<float, Part>> vector,
